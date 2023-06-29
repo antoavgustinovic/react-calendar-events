@@ -4,7 +4,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-import useAuth from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/use-auth';
 import { UserType } from '../../types/user-types';
 
 function LoginPage() {

@@ -1,6 +1,6 @@
 import { Box, Button, Spinner } from '@chakra-ui/react';
 
-import useAuth from '../../hooks/use-auth';
+import { useAuth } from '../../hooks/use-auth';
 
 function HomePage() {
   const { user, handleLogout } = useAuth();

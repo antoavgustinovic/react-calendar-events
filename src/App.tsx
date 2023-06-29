@@ -1,39 +1,28 @@
 import './App.css';
 
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
 
 import ProtectedRoute from './components/protected-route';
-import { AuthProvider } from './contexts/auth-context';
+import Providers from './components/providers';
 import HomePage from './pages/home-page/home-page';
 import LoginPage from './pages/login/login';
 
 function App() {
-  const router = createBrowserRouter([
-    {
-      element: (
-        <AuthProvider>
-          <GoogleOAuthProvider clientId="695308344557-qaep1rg6cr8v58u7alojih9f9lggnk29.apps.googleusercontent.com">
-            <Outlet />
-          </GoogleOAuthProvider>
-        </AuthProvider>
-      ),
-      children: [
-        {
-          path: '/',
-          element: (
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route element={<Providers />}>
+        <Route
+          path="/"
+          element={
             <ProtectedRoute>
               <HomePage />
             </ProtectedRoute>
-          ),
-        },
-        {
-          path: 'login',
-          element: <LoginPage />,
-        },
-      ],
-    },
-  ]);
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+      </Route>,
+    ),
+  );
 
   return <RouterProvider router={router} />;
 }
