@@ -4,13 +4,14 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } 
 
 import ProtectedRoute from './components/protected-route';
 import Providers from './components/providers';
-import HomePage from './pages/home-page/home-page';
+import ErrorPage from './pages/error/error-page';
+import HomePage from './pages/home/home-page';
 import LoginPage from './pages/login/login';
 
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route element={<Providers />}>
+      <Route element={<Providers />} errorElement={<ErrorPage />}>
         <Route
           path="/"
           element={
