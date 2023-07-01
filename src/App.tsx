@@ -1,11 +1,11 @@
 import './App.css';
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import axios from 'axios';
 import { createBrowserRouter, createRoutesFromElements, Outlet, Route, RouterProvider } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 
 import ProtectedRoute from './components/protected-route';
+import axios, { AxiosInterceptor } from './config/axios';
 import { AuthContextProvider, useGetToken } from './hooks/use-auth';
 import ErrorPage from './pages/error/error-page';
 import HomePage from './pages/home/home-page';
@@ -17,21 +17,23 @@ function Providers() {
   console.log('TOKEN STATE: ', tokenState);
 
   return (
-    <SWRConfig
-      value={{
-        // refreshInterval: 3000,
-        fetcher: (resource: string) =>
-          axios.get(getResourceUrl(resource), {
-            headers: { ...(tokenState.token ? { Authorization: `Bearer ${tokenState.token}` } : {}) },
-          }),
-      }}
-    >
-      <AuthContextProvider tokenState={tokenState}>
-        <GoogleOAuthProvider clientId="695308344557-qaep1rg6cr8v58u7alojih9f9lggnk29.apps.googleusercontent.com">
-          <Outlet />
-        </GoogleOAuthProvider>
-      </AuthContextProvider>
-    </SWRConfig>
+    <AuthContextProvider tokenState={tokenState}>
+      <AxiosInterceptor>
+        <SWRConfig
+          value={{
+            // refreshInterval: 3000,
+            fetcher: (resource: string) =>
+              axios.get(getResourceUrl(resource), {
+                headers: { ...(tokenState.token ? { Authorization: `Bearer ${tokenState.token}` } : {}) },
+              }),
+          }}
+        >
+          <GoogleOAuthProvider clientId="695308344557-qaep1rg6cr8v58u7alojih9f9lggnk29.apps.googleusercontent.com">
+            <Outlet />
+          </GoogleOAuthProvider>
+        </SWRConfig>
+      </AxiosInterceptor>
+    </AuthContextProvider>
   );
 }
 

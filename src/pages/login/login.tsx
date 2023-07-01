@@ -1,11 +1,11 @@
 /* eslint-disable no-alert */
 import { Box, Button, Flex, Heading } from '@chakra-ui/react';
 import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { preload } from 'swr';
 
+import axios from '../../config/axios';
 import { useAuth } from '../../hooks/use-auth';
 import { EVENTS_URL_KEY, getResourceUrl } from '../../utils/helpers';
 
