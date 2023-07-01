@@ -25,10 +25,12 @@
     "@react-oauth/google": "^0.11.0",
     "axios": "^1.4.0",
     "framer-motion": "^10.12.17",
-    "lint-staged": "^13.2.3",
+    "googleapis": "^120.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.14.0"
+    "react-error-boundary": "^4.0.10",
+    "react-router-dom": "^6.14.0",
+    "swr": "^2.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.14",
@@ -47,6 +49,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
     "prettier": "2.8.8",
     "typescript": "^5.1.3",
     "vite": "^4.3.9"

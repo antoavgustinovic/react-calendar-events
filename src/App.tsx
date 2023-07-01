@@ -1,12 +1,39 @@
 import './App.css';
 
-import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import axios from 'axios';
+import { createBrowserRouter, createRoutesFromElements, Outlet, Route, RouterProvider } from 'react-router-dom';
+import { SWRConfig } from 'swr';
 
 import ProtectedRoute from './components/protected-route';
-import Providers from './components/providers';
+import { AuthContextProvider, useGetToken } from './hooks/use-auth';
 import ErrorPage from './pages/error/error-page';
 import HomePage from './pages/home/home-page';
 import LoginPage from './pages/login/login';
+import { getResourceUrl } from './utils/helpers';
+
+function Providers() {
+  const tokenState = useGetToken();
+  console.log('TOKEN STATE: ', tokenState);
+
+  return (
+    <SWRConfig
+      value={{
+        // refreshInterval: 3000,
+        fetcher: (resource: string) =>
+          axios.get(getResourceUrl(resource), {
+            headers: { ...(tokenState.token ? { Authorization: `Bearer ${tokenState.token}` } : {}) },
+          }),
+      }}
+    >
+      <AuthContextProvider tokenState={tokenState}>
+        <GoogleOAuthProvider clientId="695308344557-qaep1rg6cr8v58u7alojih9f9lggnk29.apps.googleusercontent.com">
+          <Outlet />
+        </GoogleOAuthProvider>
+      </AuthContextProvider>
+    </SWRConfig>
+  );
+}
 
 function App() {
   const router = createBrowserRouter(

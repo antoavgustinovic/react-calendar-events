@@ -2,40 +2,38 @@
 import { Box, Button, Flex, Heading } from '@chakra-ui/react';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { preload } from 'swr';
 
 import { useAuth } from '../../hooks/use-auth';
-import { UserType } from '../../types/user-types';
+import { EVENTS_URL_KEY, getResourceUrl } from '../../utils/helpers';
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { user, handleLogin, setUserProfile } = useAuth();
+  const { token, handleLogin } = useAuth();
 
-  const googleLogin = useGoogleLogin({
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    onSuccess: async (tokenResponse) => {
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
       handleLogin(tokenResponse.access_token);
-      try {
-        const userInfo = await axios.get<UserType>('https://www.googleapis.com/oauth2/v3/userinfo', {
+      //   eslint-disable-next-line @typescript-eslint/no-floating-promises
+      preload(EVENTS_URL_KEY, (resource: string) =>
+        axios.get(getResourceUrl(resource), {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        });
-        setUserProfile(userInfo.data);
-      } catch (error) {
-        const err = error as Error;
-        alert(`Couldn't fetch the User Profile Data. Error: ${err.message}`);
-      }
+        }),
+      );
     },
     onError: (errorResponse) => {
       alert(errorResponse);
-      // eslint-disable-next-line no-console
-      console.log(errorResponse);
     },
     scope: 'profile email https://www.googleapis.com/auth/calendar',
   });
 
-  if (user?.accessToken) {
-    navigate('/');
-  }
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  }, [navigate, token]);
 
   return (
     <Flex h="100vh" justifyContent="center" backgroundColor="gray.100">
@@ -47,7 +45,7 @@ function LoginPage() {
           Log in
         </Heading>
         <Flex pt="5vh" justifyContent="center">
-          <Button justifyContent="center" colorScheme="twitter" onClick={() => googleLogin()}>
+          <Button justifyContent="center" colorScheme="twitter" onClick={() => login()}>
             Sign in with Google 🚀
           </Button>
         </Flex>

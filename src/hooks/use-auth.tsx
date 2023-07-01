@@ -1,64 +1,55 @@
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { UserType } from '../types/user-types';
 import useLocalStorage from './use-local-storage';
 
-const USER_KEY = 'user';
+const ACCESS_TOKEN = 'accessToken';
 
 interface AuthContextType {
-  user?: UserType | null;
+  token?: string | null;
   handleLogin: (accessToken: string) => void;
   handleLogout: () => void;
-  setUserProfile: (user: UserType) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  user: null,
+  token: null,
   handleLogin: () => {},
   handleLogout: () => {},
-  setUserProfile: () => {},
 });
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser, removeKey] = useLocalStorage<UserType | null>({
-    key: USER_KEY,
-    initialValue: null,
-  });
+type AuthContextProviderProps = {
+  children: ReactNode;
+  tokenState: ReturnType<typeof useGetToken>;
+};
+
+export function AuthContextProvider({ children, tokenState }: AuthContextProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { token, setToken, removeToken } = tokenState;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const from: string = (location.state?.from?.pathname as string) || '/';
 
   const handleLogin = useCallback(
     (_token: string) => {
-      setUser((prevUser) => ({ ...prevUser, accessToken: _token }));
+      setToken(_token);
       navigate(from, { replace: true });
     },
-    [from, navigate, setUser],
+    [from, navigate, setToken],
   );
 
   const handleLogout = useCallback(() => {
-    removeKey();
+    removeToken();
     navigate('/login');
-  }, [navigate, removeKey]);
-
-  const setUserProfile = useCallback(
-    (user: UserType) => {
-      setUser((prevUser) => ({ ...prevUser, ...user }));
-    },
-    [setUser],
-  );
+  }, [navigate, removeToken]);
 
   const value = useMemo(
     () => ({
-      user,
+      token,
       handleLogin,
       handleLogout,
-      setUserProfile,
     }),
-    [handleLogin, handleLogout, setUserProfile, user],
+    [token, handleLogin, handleLogout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -67,3 +58,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+
+export const useGetToken = () => {
+  const [token, setToken, removeToken] = useLocalStorage<string | null>({
+    key: ACCESS_TOKEN,
+    initialValue: null,
+  });
+  return { token, setToken, removeToken };
+};
