@@ -12,6 +12,7 @@ const params = {
   singleEvents: true,
   orderBy: 'startTime',
   showDeleted: false,
+  //   maxResults: '15',
 };
 
 export const str = Object.entries(params)

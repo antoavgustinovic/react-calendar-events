@@ -1,9 +1,10 @@
-import { Alert, AlertIcon, Box, Flex, Heading, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Alert, AlertIcon, Box, Flex, Spinner } from '@chakra-ui/react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { calendar_v3 } from 'googleapis';
 import useSWR from 'swr';
 
 import { EVENTS_URL_KEY } from '../../utils/helpers';
+import CalendarEvents from './events';
 
 function HomePage() {
   const {
@@ -29,28 +30,7 @@ function HomePage() {
     );
   }
 
-  return (
-    <Box mt="1vh">
-      <VStack spacing={4} align="stretch">
-        {events?.data?.items?.map((event) => (
-          <Box
-            key={event.id}
-            borderWidth="1px"
-            borderRadius="md"
-            p={4}
-            bg="gray.100"
-            _hover={{ bg: 'gray.200', cursor: 'pointer' }}
-            transition="background-color 0.2s"
-          >
-            <Heading size="md">{event.summary}</Heading>
-            <Text fontSize="sm" color="gray.500">
-              {event?.start && event?.end && `${String(event.start.date)} - ${String(event.end.date)}`}
-            </Text>
-          </Box>
-        ))}
-      </VStack>
-    </Box>
-  );
+  return <Box mt="1vh">{events?.data?.items && <CalendarEvents events={events?.data?.items} />}</Box>;
 }
 
 export default HomePage;
