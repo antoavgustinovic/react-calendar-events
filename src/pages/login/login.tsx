@@ -37,14 +37,14 @@ function LoginPage() {
 
   return (
     <Flex h="100vh" justifyContent="center" backgroundColor="gray.100">
-      <Box width="40%" mt="60" height="40%" borderRadius="10px" backgroundColor="gray.50" shadow="dark-lg">
-        <Heading fontFamily="monospace" color="blue.800" fontSize="60" textAlign="center" pt="10vh">
+      <Box width="70vh" mt="60" height="35vh" borderRadius="10px" backgroundColor="gray.50" shadow="dark-lg">
+        <Heading fontFamily="monospace" color="blue.800" fontSize="7vh" textAlign="center" pt="6vh">
           Calendar Events
         </Heading>
         <Heading fontFamily="monospace" color="blue.800" fontSize="30" textAlign="center">
           Log in
         </Heading>
-        <Flex pt="5vh" justifyContent="center">
+        <Flex pt="7vh" justifyContent="center">
           <Button justifyContent="center" colorScheme="twitter" onClick={() => login()}>
             Sign in with Google 🚀
           </Button>

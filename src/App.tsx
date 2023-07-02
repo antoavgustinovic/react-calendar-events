@@ -14,7 +14,6 @@ import { getResourceUrl } from './utils/helpers';
 
 function Providers() {
   const tokenState = useGetToken();
-  console.log('TOKEN STATE: ', tokenState);
 
   return (
     <AuthContextProvider tokenState={tokenState}>
