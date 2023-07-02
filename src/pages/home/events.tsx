@@ -4,17 +4,28 @@ import {
   Button,
   Center,
   Flex,
+  FormControl,
+  FormLabel,
   Heading,
   HStack,
   IconButton,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Spinner,
   Text,
+  useDisclosure,
   useToast,
   VStack,
 } from '@chakra-ui/react';
 import { endOfWeek, format, startOfWeek } from 'date-fns';
 import { calendar_v3 } from 'googleapis';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 
 import axiosInstance from '../../config/axios';
@@ -106,11 +117,11 @@ const getDateRangeAndTimeRange = (start?: calendar_v3.Schema$EventDateTime, end?
   return '';
 };
 
-const deleteUserApi = (url: string, { arg }: { arg: string }) => axiosInstance.delete(`${EVENTS_URL_KEY}${arg}`);
+const deleteEventApi = (url: string, { arg }: { arg: string }) => axiosInstance.delete(`${EVENTS_URL_KEY}${arg}`);
 
 function Event({ event }: { event: calendar_v3.Schema$Event }) {
   const toast = useToast();
-  const { trigger: deleteUser, isMutating } = useSWRMutation(EVENTS_URL_WITH_QUERY_PARAMS_KEY, deleteUserApi);
+  const { trigger: deleteUser, isMutating } = useSWRMutation(EVENTS_URL_WITH_QUERY_PARAMS_KEY, deleteEventApi);
   const { id, start, end, summary } = event;
 
   if (isMutating) {
@@ -169,12 +180,60 @@ function EventList({ events }: { events: calendar_v3.Schema$Event[] }) {
   ));
 }
 
+interface NewEventRequestBodyType {
+  start: {
+    dateTime: string;
+    timeZone: string;
+  };
+  end: {
+    dateTime: string;
+    timeZone: string;
+  };
+  summary: string;
+}
+
+interface Inputs {
+  title: string;
+  startDate: string;
+  endDate: string;
+}
+
+const addEventApi = (url: string, { arg }: { arg: NewEventRequestBodyType }) =>
+  axiosInstance.post(`${EVENTS_URL_KEY}`, JSON.stringify(arg));
+
 function CalendarEvents({ events }: { events: calendar_v3.Schema$Event[] }) {
   const [displayEvents, setDisplayEvents] = useState('7d');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { handleSubmit, register, reset } = useForm<Inputs>();
+  const { trigger: addEvent, isMutating } = useSWRMutation(EVENTS_URL_WITH_QUERY_PARAMS_KEY, addEventApi);
+  const toast = useToast();
 
   const handleDisplay = (event: React.MouseEvent<HTMLButtonElement>) => setDisplayEvents(event.currentTarget.name);
 
   const groupedEvents = groupEvents(events, displayEvents);
+
+  const onSubmit = handleSubmit((values) => {
+    const timeZone = 'Europe/Zagreb';
+    const body = {
+      start: {
+        dateTime: `${values.startDate}:00`,
+        timeZone,
+      },
+      end: {
+        dateTime: `${values.endDate}:00`,
+        timeZone,
+      },
+      summary: values.title,
+    };
+
+    addEvent(body, {
+      onSuccess: () => toast({ status: 'success', title: 'Event created successfully' }),
+      onError: () => toast({ status: 'error', title: 'There was an error while trying to create your event' }),
+    });
+
+    onClose();
+    reset();
+  });
 
   return (
     <>
@@ -203,10 +262,13 @@ function CalendarEvents({ events }: { events: calendar_v3.Schema$Event[] }) {
         >
           Next 30 days
         </Button>
+        <Button colorScheme="blue" position="absolute" right="30px" mt="18px" onClick={onOpen}>
+          New Event
+        </Button>
       </HStack>
       <VStack spacing={4} align="stretch">
         {groupedEvents.map(({ days, events }) => (
-          <Box key={days}>
+          <Box key={days} mx={1}>
             <Heading fontFamily="monospace" color="green.600" size="lg" textAlign="center">
               {days}
             </Heading>
@@ -214,6 +276,33 @@ function CalendarEvents({ events }: { events: calendar_v3.Schema$Event[] }) {
           </Box>
         ))}
       </VStack>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create a new Event</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <form onSubmit={onSubmit}>
+              <FormControl>
+                <FormLabel htmlFor="title">Title</FormLabel>
+                <Input id="title" placeholder="title" mb={3} {...register('title')} />
+                <FormLabel htmlFor="startDate">Event start date</FormLabel>
+                <Input id="startDate" type="datetime-local" mb={3} {...register('startDate')} />
+                <FormLabel htmlFor="endDate">Event end date</FormLabel>
+                <Input id="endDate" type="datetime-local" mb={3} {...register('endDate')} />
+              </FormControl>
+              <HStack my={4} justifyContent="flex-end">
+                <Button variant="ghost" onClick={onClose}>
+                  Close
+                </Button>
+                <Button colorScheme="teal" isLoading={isMutating} type="submit">
+                  Submit
+                </Button>
+              </HStack>
+            </form>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
   );
 }
