@@ -3,7 +3,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { calendar_v3 } from 'googleapis';
 import useSWR from 'swr';
 
-import { EVENTS_URL_KEY } from '../../utils/helpers';
+import { EVENTS_URL_WITH_QUERY_PARAMS_KEY } from '../../utils/helpers';
 import CalendarEvents from './events';
 
 function HomePage() {
@@ -11,7 +11,7 @@ function HomePage() {
     data: events,
     error,
     isLoading,
-  } = useSWR<AxiosResponse<calendar_v3.Schema$Events>, AxiosError>(EVENTS_URL_KEY);
+  } = useSWR<AxiosResponse<calendar_v3.Schema$Events>, AxiosError>(EVENTS_URL_WITH_QUERY_PARAMS_KEY);
 
   if (error) {
     return (

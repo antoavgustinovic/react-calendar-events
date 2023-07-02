@@ -1,4 +1,4 @@
-import { Avatar, Box, Flex, Heading, HStack, Menu, MenuButton, MenuItem, MenuList, Spinner } from '@chakra-ui/react';
+import { Avatar, Box, Flex, Heading, Menu, MenuButton, MenuItem, MenuList, Spinner } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 
 import { useAuth } from '../hooks/use-auth';

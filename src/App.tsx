@@ -20,7 +20,6 @@ function Providers() {
       <AxiosInterceptor>
         <SWRConfig
           value={{
-            // refreshInterval: 3000,
             fetcher: (resource: string) =>
               axios.get(getResourceUrl(resource), {
                 headers: { ...(tokenState.token ? { Authorization: `Bearer ${tokenState.token}` } : {}) },

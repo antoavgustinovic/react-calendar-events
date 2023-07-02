@@ -40,6 +40,7 @@ export function AuthContextProvider({ children, tokenState }: AuthContextProvide
 
   const handleLogout = useCallback(() => {
     removeToken();
+
     navigate('/login');
   }, [navigate, removeToken]);
 

@@ -1,7 +1,24 @@
-import { Box, Button, Heading, HStack, Text, VStack } from '@chakra-ui/react';
+import { DeleteIcon } from '@chakra-ui/icons';
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  Spinner,
+  Text,
+  useToast,
+  VStack,
+} from '@chakra-ui/react';
 import { endOfWeek, format, startOfWeek } from 'date-fns';
 import { calendar_v3 } from 'googleapis';
 import { useState } from 'react';
+import useSWRMutation from 'swr/mutation';
+
+import axiosInstance from '../../config/axios';
+import { EVENTS_URL_KEY, EVENTS_URL_WITH_QUERY_PARAMS_KEY } from '../../utils/helpers';
 
 enum DisplayTime {
   NEXT_24H = '24h',
@@ -75,32 +92,81 @@ function groupEvents(events: calendar_v3.Schema$Event[], displayEvents: string) 
   }));
 }
 
-function renderEvent({ id, summary, start, end }: calendar_v3.Schema$Event) {
-  const eventStart = getDateTimeOrDate(start);
-  const eventEnd = getDateTimeOrDate(end);
+const getDateRangeAndTimeRange = (start?: calendar_v3.Schema$EventDateTime, end?: calendar_v3.Schema$EventDateTime) => {
+  if (start?.date && end?.date) {
+    return `${formatDate(new Date(start.date))}-${formatDate(new Date(end.date))}`;
+  }
+
+  if (start?.dateTime && end?.dateTime) {
+    return `${formatDate(new Date(start.dateTime))} ${formatTime(new Date(start.dateTime))}-${formatTime(
+      new Date(end.dateTime),
+    )}`;
+  }
+
+  return '';
+};
+
+const deleteUserApi = (url: string, { arg }: { arg: string }) => axiosInstance.delete(`${EVENTS_URL_KEY}${arg}`);
+
+function Event({ event }: { event: calendar_v3.Schema$Event }) {
+  const toast = useToast();
+  const { trigger: deleteUser, isMutating } = useSWRMutation(EVENTS_URL_WITH_QUERY_PARAMS_KEY, deleteUserApi);
+  const { id, start, end, summary } = event;
+
+  if (isMutating) {
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  }
+
+  const handleDelete = (id: string) => {
+    deleteUser(id, {
+      onSuccess: () => toast({ status: 'success', title: 'Event deleted' }),
+      onError: () => toast({ status: 'error', title: 'There was an error while trying to delete your event' }),
+    });
+  };
 
   return (
-    <Box
+    <Flex
       key={id}
       borderWidth="1px"
       borderRadius="md"
-      p={4}
+      p={3}
       m={1}
       bg="gray.100"
       _hover={{ bg: 'gray.200', cursor: 'pointer' }}
       transition="background-color 0.2s"
+      align="center"
     >
-      <Heading size="sm" textAlign="center">
-        {summary}
-      </Heading>
-      <Box>
+      <Box flex={1}>
+        <Heading size="sm" textAlign="center">
+          {summary}
+        </Heading>
         <Text fontSize="md" textAlign="center" color="gray.500">
-          {eventStart ? formatDate(new Date(eventStart)) : ''}{' '}
-          {eventStart && eventEnd ? `${formatTime(new Date(eventStart))}-${formatTime(new Date(eventEnd))}` : ''}
+          {getDateRangeAndTimeRange(start, end)}
         </Text>
       </Box>
-    </Box>
+      <Box>
+        <IconButton
+          aria-label="Delete"
+          colorScheme="red"
+          size="sm"
+          icon={<DeleteIcon />}
+          onClick={() => id && handleDelete(id)}
+        />
+      </Box>
+    </Flex>
   );
+}
+
+function EventList({ events }: { events: calendar_v3.Schema$Event[] }) {
+  return events.map((event) => (
+    <Box key={event.id}>
+      <Event event={event} />
+    </Box>
+  ));
 }
 
 function CalendarEvents({ events }: { events: calendar_v3.Schema$Event[] }) {
@@ -108,26 +174,43 @@ function CalendarEvents({ events }: { events: calendar_v3.Schema$Event[] }) {
 
   const handleDisplay = (event: React.MouseEvent<HTMLButtonElement>) => setDisplayEvents(event.currentTarget.name);
 
+  const groupedEvents = groupEvents(events, displayEvents);
+
   return (
     <>
       <HStack justifyContent="center" spacing="2vh" mb="20px">
-        <Button variant="link" onClick={handleDisplay} name={DisplayTime.NEXT_24H}>
+        <Button
+          variant="link"
+          onClick={handleDisplay}
+          name={DisplayTime.NEXT_24H}
+          _focus={{ fontWeight: 'bold', color: 'green.600' }}
+        >
           Next 24 Hours
         </Button>
-        <Button variant="link" onClick={handleDisplay} name={DisplayTime.NEXT_7_DAYS}>
+        <Button
+          variant="link"
+          onClick={handleDisplay}
+          name={DisplayTime.NEXT_7_DAYS}
+          _focus={{ fontWeight: 'bold', color: 'green.600' }}
+        >
           Next 7 days
         </Button>
-        <Button variant="link" onClick={handleDisplay} name={DisplayTime.NEXT_30_DAYS}>
+        <Button
+          variant="link"
+          onClick={handleDisplay}
+          name={DisplayTime.NEXT_30_DAYS}
+          _focus={{ fontWeight: 'bold', color: 'green.600' }}
+        >
           Next 30 days
         </Button>
       </HStack>
       <VStack spacing={4} align="stretch">
-        {groupEvents(events, displayEvents).map(({ days, events }) => (
+        {groupedEvents.map(({ days, events }) => (
           <Box key={days}>
             <Heading fontFamily="monospace" color="green.600" size="lg" textAlign="center">
               {days}
             </Heading>
-            {events.map(renderEvent)}
+            <EventList events={events} />
           </Box>
         ))}
       </VStack>
