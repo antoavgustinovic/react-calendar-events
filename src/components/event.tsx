@@ -1,13 +1,15 @@
 import { DeleteIcon } from '@chakra-ui/icons';
-import { Box, Center, Flex, Heading, IconButton, Spinner, Text, useToast } from '@chakra-ui/react';
+import { Box, Center, Flex, Heading, IconButton, Spinner, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 
 import { useDeleteEvents } from '../hooks/use-events';
+import Modal from '../UI/Modal';
 import { getDateRangeAndTimeRange } from '../utils/helpers';
 
 function Event({ event }: { event: calendar_v3.Schema$Event }) {
   const toast = useToast();
   const { trigger: deleteUser, isMutating } = useDeleteEvents();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { id, start, end, summary } = event;
 
   if (isMutating) {
@@ -46,14 +48,17 @@ function Event({ event }: { event: calendar_v3.Schema$Event }) {
         </Text>
       </Box>
       <Box>
-        <IconButton
-          aria-label="Delete"
-          colorScheme="red"
-          size="sm"
-          icon={<DeleteIcon />}
-          onClick={() => id && handleDelete(id)}
-        />
+        <IconButton aria-label="Delete" colorScheme="red" size="sm" icon={<DeleteIcon />} onClick={() => onOpen()} />
       </Box>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        onConfirm={() => id && handleDelete(id)}
+        modalHeader="Are you sure?"
+        modalBody={<Text as="em">Are you sure that you want to delete this event? </Text>}
+        buttonCloseText="Cancel"
+        buttonConfirmText="Confirm"
+      />
     </Flex>
   );
 }

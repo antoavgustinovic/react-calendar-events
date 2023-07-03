@@ -18,7 +18,7 @@ type Props = {
   buttonCloseText?: string;
   buttonConfirmText?: string;
   isOpen: boolean;
-  type: ModalType;
+  type?: ModalType;
   onClose: () => void;
   onConfirm?: () => void;
 };
@@ -33,7 +33,7 @@ const Modal: React.FC<Props> = ({
   onClose,
   onConfirm,
 }) => (
-  <ChakraModal isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered size="3xl">
+  <ChakraModal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
     <ModalContent>
       <ModalHeader>{modalHeader}</ModalHeader>

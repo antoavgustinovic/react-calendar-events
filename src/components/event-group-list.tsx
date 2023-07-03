@@ -6,7 +6,7 @@ import DisplayTimeRange from '../enums/events';
 import { groupEvents } from '../utils/helpers';
 import EventList from './event-list';
 import Navbar from './navbar';
-import NewEventModal from './new-event-modal';
+import NewEventModal from './new-event';
 
 function EventGroupList({ events }: { events: calendar_v3.Schema$Event[] }) {
   const [displayEvents, setDisplayEvents] = useState<string>(DisplayTimeRange.NEXT_7_DAYS);
