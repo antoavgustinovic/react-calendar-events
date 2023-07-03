@@ -1,5 +1,5 @@
 import { endOfWeek, format, startOfWeek } from 'date-fns';
-import { calendar_v3 } from 'googleapis';
+import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 
 import DisplayTimeRange from '../enums/events';
 
@@ -20,7 +20,6 @@ const params = {
   singleEvents: true,
   orderBy: 'startTime',
   showDeleted: false,
-  //   maxResults: '15',
 };
 
 export const queryParams = Object.entries(params)
@@ -37,18 +36,36 @@ function formatTime(date: Date) {
   return format(date, 'HH:mm');
 }
 
+function isEndDateTimeGreater(startDateTime: Date, endDateTime: Date): boolean {
+  const twentyFourHoursInMilliseconds = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+  const differenceInMilliseconds = endDateTime.getTime() - startDateTime.getTime();
+
+  return differenceInMilliseconds >= twentyFourHoursInMilliseconds;
+}
+
 export const getDateRangeAndTimeRange = (
   start?: calendar_v3.Schema$EventDateTime,
   end?: calendar_v3.Schema$EventDateTime,
-) => {
+): string => {
+  const formatDateAndTime = (datetime: string): string => {
+    const date = new Date(datetime);
+    return `${formatDate(date)} ${formatTime(date)}`;
+  };
+
   if (start?.date && end?.date) {
     return `${formatDate(new Date(start.date))}-${formatDate(new Date(end.date))}`;
   }
 
   if (start?.dateTime && end?.dateTime) {
-    return `${formatDate(new Date(start.dateTime))} ${formatTime(new Date(start.dateTime))}-${formatTime(
-      new Date(end.dateTime),
-    )}`;
+    const startDateAndTime = formatDateAndTime(start.dateTime);
+    const endDateAndTime = formatDateAndTime(end.dateTime);
+
+    if (isEndDateTimeGreater(new Date(start.dateTime), new Date(end.dateTime))) {
+      return `${startDateAndTime} - ${endDateAndTime}`;
+    }
+
+    return `${startDateAndTime}-${formatTime(new Date(end.dateTime))}`;
   }
 
   return '';
