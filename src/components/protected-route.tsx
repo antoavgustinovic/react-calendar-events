@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../hooks/use-auth';
-import Navbar from '../layout/navbar';
+import Layout from '../layout/layout';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
@@ -11,7 +11,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <Navbar>{children}</Navbar>;
+  return <Layout>{children}</Layout>;
 }
 
 export default ProtectedRoute;

@@ -3,8 +3,8 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { calendar_v3 } from 'googleapis';
 import useSWR from 'swr';
 
+import EventGroupList from '../../components/event-group-list';
 import { EVENTS_URL_WITH_QUERY_PARAMS_KEY } from '../../utils/helpers';
-import CalendarEvents from './events';
 
 function HomePage() {
   const {
@@ -30,7 +30,7 @@ function HomePage() {
     );
   }
 
-  return <Box mt="1vh">{events?.data?.items && <CalendarEvents events={events?.data?.items} />}</Box>;
+  return <Box mt="1vh">{events?.data?.items && <EventGroupList events={events?.data?.items} />}</Box>;
 }
 
 export default HomePage;

@@ -37,7 +37,9 @@
       }
     ],
     "@typescript-eslint/no-floating-promises": "off",
+    "react/function-component-definition": "off",
     "react/jsx-props-no-spreading": "off",
+    "react/require-default-props": "off",
     "no-shadow": "off",
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off",

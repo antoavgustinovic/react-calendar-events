@@ -1,14 +1,10 @@
-import { Avatar, Box, Flex, Heading, Menu, MenuButton, MenuItem, MenuList, Spinner } from '@chakra-ui/react';
+import { Avatar, Box, Flex, Heading, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { ReactNode } from 'react';
 
 import { useAuth } from '../hooks/use-auth';
 
-export default function Navbar({ children }: { children: ReactNode }) {
+export default function Layout({ children }: { children: ReactNode }) {
   const { handleLogout } = useAuth();
-
-  const data = {
-    fullName: 'Anto Avgustinovic',
-  };
 
   return (
     <Box>
@@ -18,7 +14,7 @@ export default function Navbar({ children }: { children: ReactNode }) {
         </Heading>
         <Menu>
           <MenuButton>
-            {data ? <Avatar name={data.fullName} /> : <Spinner color="white" height="48px" width="48px" />}
+            <Avatar />
           </MenuButton>
           <MenuList>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>

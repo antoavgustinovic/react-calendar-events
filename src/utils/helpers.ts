@@ -1,3 +1,8 @@
+import { endOfWeek, format, startOfWeek } from 'date-fns';
+import { calendar_v3 } from 'googleapis';
+
+import DisplayTimeRange from '../enums/events';
+
 export const API_BASE_URL = 'https://www.googleapis.com/calendar/';
 export const EVENTS_URL_KEY = `v3/calendars/primary/events/`;
 
@@ -23,3 +28,86 @@ export const queryParams = Object.entries(params)
   .join('&');
 
 export const EVENTS_URL_WITH_QUERY_PARAMS_KEY = `${EVENTS_URL_KEY}?${queryParams}`;
+
+function formatDate(date: Date) {
+  return format(date, 'd.M.yyyy');
+}
+
+function formatTime(date: Date) {
+  return format(date, 'HH:mm');
+}
+
+export const getDateRangeAndTimeRange = (
+  start?: calendar_v3.Schema$EventDateTime,
+  end?: calendar_v3.Schema$EventDateTime,
+) => {
+  if (start?.date && end?.date) {
+    return `${formatDate(new Date(start.date))}-${formatDate(new Date(end.date))}`;
+  }
+
+  if (start?.dateTime && end?.dateTime) {
+    return `${formatDate(new Date(start.dateTime))} ${formatTime(new Date(start.dateTime))}-${formatTime(
+      new Date(end.dateTime),
+    )}`;
+  }
+
+  return '';
+};
+
+function getDateTimeOrDate(value: calendar_v3.Schema$EventDateTime | undefined): string | null {
+  return value?.dateTime || value?.date || null;
+}
+
+function filterEvents(events: calendar_v3.Schema$Event[], displayEvents: string) {
+  const currTime = new Date();
+  const endTime = new Date();
+
+  if (displayEvents === DisplayTimeRange.NEXT_7_DAYS) {
+    endTime.setDate(currTime.getDate() + 7);
+  } else if (displayEvents === DisplayTimeRange.NEXT_30_DAYS) {
+    endTime.setDate(currTime.getDate() + 31);
+  } else {
+    endTime.setDate(currTime.getDate() + 1);
+  }
+
+  return events.filter(({ start, end }) => {
+    const eventStart = getDateTimeOrDate(start);
+    const eventEnd = getDateTimeOrDate(end);
+
+    if (eventStart && eventEnd) {
+      const eventStartDate = new Date(eventStart);
+      const eventEndDate = new Date(eventEnd);
+      return eventStartDate >= currTime && eventEndDate <= endTime;
+    }
+
+    return false;
+  });
+}
+
+export function groupEvents(events: calendar_v3.Schema$Event[], displayEvents: string) {
+  const filteredEvents = filterEvents(events, displayEvents);
+  const groups: { [daysWeeks: string]: calendar_v3.Schema$Event[] } = {};
+
+  filteredEvents.forEach((event) => {
+    const { start } = event;
+    const eventStart = getDateTimeOrDate(start);
+
+    if (eventStart) {
+      const eventStartDate = new Date(eventStart);
+      const daysWeeks =
+        displayEvents === DisplayTimeRange.NEXT_7_DAYS || displayEvents === DisplayTimeRange.NEXT_24H
+          ? format(eventStartDate, 'EEEE')
+          : `${format(startOfWeek(eventStartDate), 'd.M.yyyy')} - ${format(endOfWeek(eventStartDate), 'd.M.yyyy')}`;
+
+      if (!groups[daysWeeks]) {
+        groups[daysWeeks] = [];
+      }
+      groups[daysWeeks].push(event);
+    }
+  });
+
+  return Object.entries(groups).map(([days, events]) => ({
+    days,
+    events,
+  }));
+}
