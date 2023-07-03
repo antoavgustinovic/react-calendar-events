@@ -3,13 +3,10 @@ import { useForm } from 'react-hook-form';
 
 import ModalType from '../enums/modal';
 import { useAddEvent } from '../hooks/use-events';
+import { buildEventDTO } from '../service/events-service';
+import { NewEventFormData } from '../types/event-types';
 import Modal from '../ui/modal';
-
-interface FormData {
-  title: string;
-  startDate: string;
-  endDate: string;
-}
+import { getSortedEventsByStartDate } from '../utils/date-helper';
 
 type Props = {
   isOpen: boolean;
@@ -17,32 +14,22 @@ type Props = {
 };
 
 function NewEventModal({ isOpen, onClose }: Props) {
-  const { handleSubmit, register, reset } = useForm<FormData>();
+  const { handleSubmit, register, reset } = useForm<NewEventFormData>();
   const { trigger: addEvent } = useAddEvent();
   const toast = useToast();
 
   const onSubmit = handleSubmit((values) => {
-    const timeZone = 'Europe/Zagreb';
-    const requestBody = {
-      start: {
-        dateTime: `${values.startDate}:00`,
-        timeZone,
-      },
-      end: {
-        dateTime: `${values.endDate}:00`,
-        timeZone,
-      },
-      summary: values.title,
-    };
+    const requestBody = buildEventDTO(values);
 
     addEvent(requestBody, {
       onSuccess: () => toast({ status: 'success', title: 'Event created successfully' }),
       onError: () => toast({ status: 'error', title: 'There was an error while trying to create your event' }),
-      // TODO: sort
-      optimisticData: (currentEvents) => ({
-        ...currentEvents,
-        items: currentEvents?.items && [...currentEvents.items, requestBody],
-      }),
+      optimisticData: (currentEvents) => {
+        const items = currentEvents?.items ? [...currentEvents.items, requestBody] : [requestBody];
+        const sortedItems = getSortedEventsByStartDate(items);
+
+        return { ...currentEvents, items: sortedItems };
+      },
     });
     onClose();
     reset();

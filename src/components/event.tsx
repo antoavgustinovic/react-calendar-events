@@ -24,7 +24,10 @@ function Event({ event }: { event: calendar_v3.Schema$Event }) {
     deleteEvent(id, {
       onSuccess: () => toast({ status: 'success', title: 'Event deleted' }),
       onError: () => toast({ status: 'error', title: 'There was an error while trying to delete your event' }),
-      optimisticData: (events) => ({ ...events, items: events?.items?.filter((event) => event.id !== id) }),
+      optimisticData: (currentEvents) => ({
+        ...currentEvents,
+        items: currentEvents?.items?.filter((event) => event.id !== id),
+      }),
     });
   };
 

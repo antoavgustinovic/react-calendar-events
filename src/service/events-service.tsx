@@ -5,6 +5,7 @@
 import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 
 import axios from '../config/axios';
+import { NewEventFormData } from '../types/event-types';
 import { getResourceUrl } from '../utils/service-helper';
 
 interface NewEventRequestBody {
@@ -60,3 +61,18 @@ export const deleteEvent = (url: string, { arg }: { arg: string }) =>
 export const addEvent = (url: string, { arg }: { arg: NewEventRequestBody }) =>
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   axios.post(url, JSON.stringify(arg)) as Promise<calendar_v3.Schema$Events>;
+
+export const buildEventDTO = (values: NewEventFormData) => {
+  const timeZone = 'Europe/Zagreb';
+  return {
+    start: {
+      dateTime: `${values.startDate}:00`,
+      timeZone,
+    },
+    end: {
+      dateTime: `${values.endDate}:00`,
+      timeZone,
+    },
+    summary: values.title,
+  };
+};

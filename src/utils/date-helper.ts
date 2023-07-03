@@ -34,10 +34,10 @@ function isEndDateNextDay(startDate: Date, endDate: Date): boolean {
   return endHour < startHour || (endHour === startHour && endMinute < startMinute);
 }
 
-export const getDateRangeAndTimeRange = (
+export function getDateRangeAndTimeRange(
   start?: calendar_v3.Schema$EventDateTime,
   end?: calendar_v3.Schema$EventDateTime,
-): string => {
+): string {
   const formatDateAndTime = (datetime: string): string => {
     const date = new Date(datetime);
     return `${formatDate(date)} ${formatTime(date)}`;
@@ -59,7 +59,7 @@ export const getDateRangeAndTimeRange = (
   }
 
   return '';
-};
+}
 
 function getDateTimeOrDate(value: calendar_v3.Schema$EventDateTime | undefined): string | null {
   return value?.dateTime || value?.date || null;
@@ -117,4 +117,15 @@ export function groupEvents(events: calendar_v3.Schema$Event[], displayEvents: s
     days,
     events,
   }));
+}
+
+export function getSortedEventsByStartDate(events: calendar_v3.Schema$Event[]) {
+  const sortedEvents = [...events].sort((a, b) => {
+    const aStartDate = a?.start?.dateTime ?? a?.start?.date ?? '';
+    const bStartDate = b?.start?.dateTime ?? b?.start?.date ?? '';
+
+    return new Date(aStartDate).getTime() - new Date(bStartDate).getTime();
+  });
+
+  return sortedEvents;
 }
