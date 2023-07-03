@@ -38,6 +38,11 @@ function NewEventModal({ isOpen, onClose }: Props) {
     addEvent(requestBody, {
       onSuccess: () => toast({ status: 'success', title: 'Event created successfully' }),
       onError: () => toast({ status: 'error', title: 'There was an error while trying to create your event' }),
+      // TODO: sort
+      optimisticData: (currentEvents) => ({
+        ...currentEvents,
+        items: currentEvents?.items && [...currentEvents.items, requestBody],
+      }),
     });
     onClose();
     reset();

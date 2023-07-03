@@ -57,4 +57,6 @@ export const deleteEvent = (url: string, { arg }: { arg: string }) =>
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   axios.delete(`${url}${arg}`) as Promise<calendar_v3.Schema$Events>;
 
-export const addEvent = (url: string, { arg }: { arg: NewEventRequestBody }) => axios.post(url, JSON.stringify(arg));
+export const addEvent = (url: string, { arg }: { arg: NewEventRequestBody }) =>
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  axios.post(url, JSON.stringify(arg)) as Promise<calendar_v3.Schema$Events>;

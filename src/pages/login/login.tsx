@@ -10,6 +10,7 @@ import { preloadEvents } from '../../hooks/use-events';
 function LoginPage() {
   const navigate = useNavigate();
   const { token, handleLogin } = useAuth();
+
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       handleLogin(tokenResponse.access_token);
