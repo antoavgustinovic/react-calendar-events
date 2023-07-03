@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 
 import ModalType from '../enums/modal';
 import { useAddEvent } from '../hooks/use-events';
-import Modal from '../UI/Modal';
+import Modal from '../ui/modal';
 
 interface FormData {
   title: string;
@@ -20,6 +20,7 @@ function NewEventModal({ isOpen, onClose }: Props) {
   const { handleSubmit, register, reset } = useForm<FormData>();
   const { trigger: addEvent } = useAddEvent();
   const toast = useToast();
+
   const onSubmit = handleSubmit((values) => {
     const timeZone = 'Europe/Zagreb';
     const requestBody = {

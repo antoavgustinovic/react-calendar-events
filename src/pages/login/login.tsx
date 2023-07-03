@@ -1,30 +1,22 @@
 /* eslint-disable no-alert */
-import { Box, Button, Flex, Heading } from '@chakra-ui/react';
+import { Alert, Box, Button, Flex, Heading } from '@chakra-ui/react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { preload } from 'swr';
 
-import axios from '../../config/axios';
 import { useAuth } from '../../hooks/use-auth';
-import { EVENTS_URL_KEY, getResourceUrl } from '../../utils/helpers';
+import { preloadEvents } from '../../service/events-service';
 
 function LoginPage() {
   const navigate = useNavigate();
   const { token, handleLogin } = useAuth();
-
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       handleLogin(tokenResponse.access_token);
-      //   eslint-disable-next-line @typescript-eslint/no-floating-promises
-      preload(EVENTS_URL_KEY, (resource: string) =>
-        axios.get(getResourceUrl(resource), {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        }),
-      );
+      preloadEvents(tokenResponse.access_token);
     },
     onError: (errorResponse) => {
-      alert(errorResponse);
+      <Alert>{errorResponse.error}</Alert>;
     },
     scope: 'profile email https://www.googleapis.com/auth/calendar',
   });

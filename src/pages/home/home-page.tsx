@@ -1,17 +1,10 @@
 import { Alert, AlertIcon, Box, Flex, Spinner } from '@chakra-ui/react';
-import { AxiosError, AxiosResponse } from 'axios';
-import { calendar_v3 } from 'googleapis';
-import useSWR from 'swr';
 
 import EventGroupList from '../../components/event-group-list';
-import { EVENTS_URL_WITH_QUERY_PARAMS_KEY } from '../../utils/helpers';
+import { useEvents } from '../../hooks/use-events';
 
 function HomePage() {
-  const {
-    data: events,
-    error,
-    isLoading,
-  } = useSWR<AxiosResponse<calendar_v3.Schema$Events>, AxiosError>(EVENTS_URL_WITH_QUERY_PARAMS_KEY);
+  const { data: events, error, isLoading } = useEvents();
 
   if (error) {
     return (
@@ -30,7 +23,7 @@ function HomePage() {
     );
   }
 
-  return <Box mt="1vh">{events?.data?.items && <EventGroupList events={events?.data?.items} />}</Box>;
+  return <Box mt="1vh">{events?.items && <EventGroupList events={events?.items} />}</Box>;
 }
 
 export default HomePage;

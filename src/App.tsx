@@ -10,7 +10,7 @@ import { AuthContextProvider, useGetToken } from './hooks/use-auth';
 import ErrorPage from './pages/error/error-page';
 import HomePage from './pages/home/home-page';
 import LoginPage from './pages/login/login';
-import { getResourceUrl } from './utils/helpers';
+import { getResourceUrl } from './utils/service-helper';
 
 function Providers() {
   const tokenState = useGetToken();
@@ -21,9 +21,11 @@ function Providers() {
         <SWRConfig
           value={{
             fetcher: (resource: string) =>
-              axios.get(getResourceUrl(resource), {
-                headers: { ...(tokenState.token ? { Authorization: `Bearer ${tokenState.token}` } : {}) },
-              }),
+              axios
+                .get(getResourceUrl(resource), {
+                  headers: { ...(tokenState.token ? { Authorization: `Bearer ${tokenState.token}` } : {}) },
+                })
+                .then((res) => res.data as object),
           }}
         >
           <GoogleOAuthProvider clientId="695308344557-qaep1rg6cr8v58u7alojih9f9lggnk29.apps.googleusercontent.com">

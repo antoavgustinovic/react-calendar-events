@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useEffect } from 'react';
 
 import { useAuth } from '../hooks/use-auth';
-import { API_BASE_URL } from '../utils/helpers';
+import { API_BASE_URL } from '../utils/service-helper';
 
 const axiosInstance = axios.create();
 
@@ -15,7 +15,6 @@ const AxiosInterceptor = ({ children }: { children: JSX.Element }) => {
       if (error.response?.status === 401) {
         handleLogout();
       }
-
       return Promise.reject(error);
     };
 

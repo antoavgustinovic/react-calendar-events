@@ -1,13 +1,12 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { addEventService, deleteEventService } from '../service/events-service';
-import { EVENTS_URL_WITH_QUERY_PARAMS_KEY } from '../utils/helpers';
+import { EVENTS_URL_WITH_QUERY_PARAMS_KEY } from '../utils/service-helper';
 
-export const useEvents = () =>
-  useSWR<AxiosResponse<calendar_v3.Schema$Events>, AxiosError>(EVENTS_URL_WITH_QUERY_PARAMS_KEY);
+export const useEvents = () => useSWR<calendar_v3.Schema$Events, AxiosError>(EVENTS_URL_WITH_QUERY_PARAMS_KEY);
 
 export const useAddEvent = () => useSWRMutation(EVENTS_URL_WITH_QUERY_PARAMS_KEY, addEventService);
 

@@ -3,8 +3,8 @@ import { Box, Center, Flex, Heading, IconButton, Spinner, Text, useDisclosure, u
 import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 
 import { useDeleteEvents } from '../hooks/use-events';
-import Modal from '../UI/Modal';
-import { getDateRangeAndTimeRange } from '../utils/helpers';
+import Modal from '../ui/modal';
+import { getDateRangeAndTimeRange } from '../utils/date-helper';
 
 function Event({ event }: { event: calendar_v3.Schema$Event }) {
   const toast = useToast();
