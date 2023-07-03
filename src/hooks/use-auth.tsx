@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { mutate } from 'swr';
 
 import useLocalStorage from './use-local-storage';
 
@@ -22,6 +23,8 @@ type AuthContextProviderProps = {
   tokenState: ReturnType<typeof useGetToken>;
 };
 
+const clearCache = () => mutate(() => true, undefined, { revalidate: false });
+
 export function AuthContextProvider({ children, tokenState }: AuthContextProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,8 +43,8 @@ export function AuthContextProvider({ children, tokenState }: AuthContextProvide
 
   const handleLogout = useCallback(() => {
     removeToken();
-
     navigate('/login');
+    clearCache();
   }, [navigate, removeToken]);
 
   const value = useMemo(
