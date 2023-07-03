@@ -11,12 +11,27 @@ function formatTime(date: Date) {
   return format(date, 'HH:mm');
 }
 
-function isEndDateTimeGreater(startDateTime: Date, endDateTime: Date): boolean {
-  const twentyFourHoursInMilliseconds = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+function isEndDateNextDay(startDate: Date, endDate: Date): boolean {
+  const startDay = startDate.getDate();
+  const startMonth = startDate.getMonth();
+  const startYear = startDate.getFullYear();
 
-  const differenceInMilliseconds = endDateTime.getTime() - startDateTime.getTime();
+  const endDay = endDate.getDate();
+  const endMonth = endDate.getMonth();
+  const endYear = endDate.getFullYear();
 
-  return differenceInMilliseconds >= twentyFourHoursInMilliseconds;
+  // Compare date parts (day, month, and year)
+  if (startDay !== endDay || startMonth !== endMonth || startYear !== endYear) {
+    return true;
+  }
+
+  // Compare time parts (hour and minute)
+  const startHour = startDate.getHours();
+  const startMinute = startDate.getMinutes();
+  const endHour = endDate.getHours();
+  const endMinute = endDate.getMinutes();
+
+  return endHour < startHour || (endHour === startHour && endMinute < startMinute);
 }
 
 export const getDateRangeAndTimeRange = (
@@ -36,7 +51,7 @@ export const getDateRangeAndTimeRange = (
     const startDateAndTime = formatDateAndTime(start.dateTime);
     const endDateAndTime = formatDateAndTime(end.dateTime);
 
-    if (isEndDateTimeGreater(new Date(start.dateTime), new Date(end.dateTime))) {
+    if (isEndDateNextDay(new Date(start.dateTime), new Date(end.dateTime))) {
       return `${startDateAndTime} - ${endDateAndTime}`;
     }
 
