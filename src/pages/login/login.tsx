@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../hooks/use-auth';
-import { preloadEvents } from '../../service/events-service';
+import { preloadEvents } from '../../hooks/use-events';
 
 function LoginPage() {
   const navigate = useNavigate();

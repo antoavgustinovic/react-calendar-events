@@ -8,7 +8,7 @@ import { getDateRangeAndTimeRange } from '../utils/date-helper';
 
 function Event({ event }: { event: calendar_v3.Schema$Event }) {
   const toast = useToast();
-  const { trigger: deleteUser, isMutating } = useDeleteEvents();
+  const { trigger: deleteEvent, isMutating } = useDeleteEvents();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { id, start, end, summary } = event;
 
@@ -21,9 +21,10 @@ function Event({ event }: { event: calendar_v3.Schema$Event }) {
   }
 
   const handleDelete = (id: string) => {
-    deleteUser(id, {
+    deleteEvent(id, {
       onSuccess: () => toast({ status: 'success', title: 'Event deleted' }),
       onError: () => toast({ status: 'error', title: 'There was an error while trying to delete your event' }),
+      optimisticData: (events) => ({ ...events, items: events?.items?.filter((event) => event.id !== id) }),
     });
   };
 
