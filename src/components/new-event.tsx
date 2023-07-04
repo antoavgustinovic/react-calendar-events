@@ -61,7 +61,7 @@ function NewEventModal({ isOpen, onClose }: Props) {
               })}
             />
           </FormControl>
-          <FormControl htmlFor="startDate" label="startDate" isInvalid={!!errors.startDate} error={errors.startDate}>
+          <FormControl htmlFor="startDate" label="Start Date" isInvalid={!!errors.startDate} error={errors.startDate}>
             <Input
               id="startDate"
               type="datetime-local"
@@ -71,7 +71,7 @@ function NewEventModal({ isOpen, onClose }: Props) {
               })}
             />
           </FormControl>
-          <FormControl htmlFor="endDate" label="endDate" isInvalid={!!errors.endDate} error={errors.endDate}>
+          <FormControl htmlFor="endDate" label="End Date" isInvalid={!!errors.endDate} error={errors.endDate}>
             <Input
               id="endDate"
               type="datetime-local"
@@ -80,7 +80,7 @@ function NewEventModal({ isOpen, onClose }: Props) {
                 required: 'This field is required',
                 validate: (endDate) =>
                   isBefore(new Date(endDate), new Date(getValues().startDate))
-                    ? 'The end date needs to be greater than the start date.'
+                    ? 'The end date needs to be after the start date.'
                     : true,
               })}
             />

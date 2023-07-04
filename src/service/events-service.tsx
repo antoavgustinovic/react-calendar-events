@@ -21,8 +21,8 @@ interface NewEventRequestBody {
 }
 
 type FetcherFn = {
-  (init: any): (resource: string) => Promise<object>;
   (token: string | null | undefined): (resource: string) => Promise<object>;
+  (init: any): (resource: string) => Promise<object>;
   (init?: any, token?: string | null): (resource: string) => Promise<object>;
 };
 

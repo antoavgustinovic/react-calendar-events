@@ -1,5 +1,6 @@
 import './App.css';
 
+import { ChakraProvider } from '@chakra-ui/react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { createBrowserRouter, createRoutesFromElements, Outlet, Route, RouterProvider } from 'react-router-dom';
 import { SWRConfig } from 'swr';
@@ -18,9 +19,11 @@ function Providers() {
     <AuthContextProvider tokenState={tokenState}>
       <AxiosInterceptor>
         <SWRConfig>
-          <GoogleOAuthProvider clientId="695308344557-qaep1rg6cr8v58u7alojih9f9lggnk29.apps.googleusercontent.com">
-            <Outlet />
-          </GoogleOAuthProvider>
+          <ChakraProvider>
+            <GoogleOAuthProvider clientId="695308344557-qaep1rg6cr8v58u7alojih9f9lggnk29.apps.googleusercontent.com">
+              <Outlet />
+            </GoogleOAuthProvider>
+          </ChakraProvider>
         </SWRConfig>
       </AxiosInterceptor>
     </AuthContextProvider>

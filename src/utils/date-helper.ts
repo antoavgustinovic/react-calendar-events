@@ -1,25 +1,22 @@
 import { format, isSameDay } from 'date-fns';
 import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 
-function formatDate(date: Date) {
-  return format(date, 'd.M.yyyy');
+function formatDate(date: string) {
+  return format(new Date(date), 'd.M.yyyy');
 }
 
-function formatTime(date: Date) {
-  return format(date, 'HH:mm');
+function formatTime(date: string) {
+  return format(new Date(date), 'HH:mm');
 }
 
 export function getDateRangeAndTimeRange(
   start?: calendar_v3.Schema$EventDateTime,
   end?: calendar_v3.Schema$EventDateTime,
 ): string {
-  const formatDateAndTime = (datetime: string): string => {
-    const date = new Date(datetime);
-    return `${formatDate(date)} ${formatTime(date)}`;
-  };
+  const formatDateAndTime = (datetime: string): string => `${formatDate(datetime)} ${formatTime(datetime)}`;
 
   if (start?.date && end?.date) {
-    return `${formatDate(new Date(start.date))}-${formatDate(new Date(end.date))}`;
+    return `${formatDate(start.date)}-${formatDate(end.date)}`;
   }
 
   if (start?.dateTime && end?.dateTime) {
@@ -30,7 +27,7 @@ export function getDateRangeAndTimeRange(
       return `${startDateAndTime} - ${endDateAndTime}`;
     }
 
-    return `${startDateAndTime}-${formatTime(new Date(end.dateTime))}`;
+    return `${startDateAndTime}-${formatTime(end.dateTime)}`;
   }
 
   return '';
