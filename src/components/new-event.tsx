@@ -1,10 +1,11 @@
-import { Button, FormControl, FormLabel, HStack, Input, useToast } from '@chakra-ui/react';
+import { Button, HStack, Input, useToast } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 
 import ModalType from '../enums/modal';
 import { useAddEvent } from '../hooks/use-events';
 import { buildEventDTO } from '../service/events-service';
 import { NewEventFormData } from '../types/event-types';
+import FormControl from '../ui/form-control';
 import Modal from '../ui/modal';
 import { getSortedEventsByStartDate } from '../utils/date-helper';
 
@@ -14,9 +15,16 @@ type Props = {
 };
 
 function NewEventModal({ isOpen, onClose }: Props) {
-  const { handleSubmit, register, reset } = useForm<NewEventFormData>();
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<NewEventFormData>();
   const { trigger: addEvent } = useAddEvent();
   const toast = useToast();
+
+  console.log(errors);
 
   const onSubmit = handleSubmit((values) => {
     const requestBody = buildEventDTO(values);
@@ -43,19 +51,41 @@ function NewEventModal({ isOpen, onClose }: Props) {
       modalHeader="Create a new Event"
       modalBody={
         <form onSubmit={onSubmit}>
-          <FormControl>
-            <FormLabel htmlFor="title">Title</FormLabel>
-            <Input id="title" placeholder="title" mb={3} {...register('title')} />
-            <FormLabel htmlFor="startDate">Event start date</FormLabel>
-            <Input id="startDate" type="datetime-local" mb={3} {...register('startDate')} />
-            <FormLabel htmlFor="endDate">Event end date</FormLabel>
-            <Input id="endDate" type="datetime-local" mb={3} {...register('endDate')} />
+          <FormControl htmlFor="title" label="Title" isInvalid={!!errors.title} error={errors.title}>
+            <Input
+              id="title"
+              placeholder="title"
+              mb={3}
+              {...register('title', {
+                required: 'This field is required',
+              })}
+            />
+          </FormControl>
+          <FormControl htmlFor="startDate" label="startDate" isInvalid={!!errors.startDate} error={errors.startDate}>
+            <Input
+              id="startDate"
+              type="datetime-local"
+              mb={3}
+              {...register('startDate', {
+                required: 'This field is required',
+              })}
+            />
+          </FormControl>
+          <FormControl htmlFor="endDate" label="endDate" isInvalid={!!errors.endDate} error={errors.endDate}>
+            <Input
+              id="endDate"
+              type="datetime-local"
+              mb={3}
+              {...register('endDate', {
+                required: 'This field is required',
+              })}
+            />
           </FormControl>
           <HStack my={4} justifyContent="flex-end">
             <Button variant="ghost" onClick={onClose}>
               Close
             </Button>
-            <Button colorScheme="teal" type="submit">
+            <Button colorScheme="teal" type="submit" isDisabled={!isValid}>
               Submit
             </Button>
           </HStack>
