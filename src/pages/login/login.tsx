@@ -1,7 +1,8 @@
 /* eslint-disable no-alert */
-import { Alert, Box, Button, Flex, Heading } from '@chakra-ui/react';
+import { Alert, Box, Button, Flex, Heading, Text } from '@chakra-ui/react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useEffect } from 'react';
+import { FcGoogle } from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../hooks/use-auth';
@@ -38,8 +39,15 @@ function LoginPage() {
           Log in
         </Heading>
         <Flex pt="7vh" justifyContent="center">
-          <Button justifyContent="center" colorScheme="twitter" onClick={() => login()}>
-            Sign in with Google 🚀
+          <Button
+            w="full"
+            maxW="md"
+            colorScheme="blackAlpha"
+            variant="outline"
+            leftIcon={<FcGoogle />}
+            onClick={() => login()}
+          >
+            <Text>Sign in with Google</Text>
           </Button>
         </Flex>
       </Box>
