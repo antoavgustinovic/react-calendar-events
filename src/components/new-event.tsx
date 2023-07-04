@@ -1,4 +1,5 @@
 import { Button, HStack, Input, useToast } from '@chakra-ui/react';
+import { isBefore } from 'date-fns';
 import { useForm } from 'react-hook-form';
 
 import ModalType from '../enums/modal';
@@ -19,12 +20,11 @@ function NewEventModal({ isOpen, onClose }: Props) {
     handleSubmit,
     register,
     reset,
-    formState: { errors, isValid },
+    formState: { errors },
+    getValues,
   } = useForm<NewEventFormData>();
   const { trigger: addEvent } = useAddEvent();
   const toast = useToast();
-
-  console.log(errors);
 
   const onSubmit = handleSubmit((values) => {
     const requestBody = buildEventDTO(values);
@@ -78,6 +78,9 @@ function NewEventModal({ isOpen, onClose }: Props) {
               mb={3}
               {...register('endDate', {
                 required: 'This field is required',
+                validate: (endDate) =>
+                  isBefore(new Date(endDate), new Date(getValues().startDate)) &&
+                  'The end date needs to be greater than the start date.',
               })}
             />
           </FormControl>
@@ -85,7 +88,7 @@ function NewEventModal({ isOpen, onClose }: Props) {
             <Button variant="ghost" onClick={onClose}>
               Close
             </Button>
-            <Button colorScheme="teal" type="submit" isDisabled={!isValid}>
+            <Button colorScheme="teal" type="submit">
               Submit
             </Button>
           </HStack>
