@@ -8,7 +8,7 @@ import { buildEventDTO } from '../service/events-service';
 import { NewEventFormData } from '../types/event-types';
 import FormControl from '../ui/form-control';
 import Modal from '../ui/modal';
-import { getSortedEventsByStartDate } from '../utils/date-helper';
+import { getSortedEventsByStartDate } from '../utils/event-helper';
 
 type Props = {
   isOpen: boolean;
@@ -20,8 +20,8 @@ function NewEventModal({ isOpen, onClose }: Props) {
     handleSubmit,
     register,
     reset,
-    formState: { errors },
     getValues,
+    formState: { errors },
   } = useForm<NewEventFormData>();
   const { trigger: addEvent } = useAddEvent();
   const toast = useToast();
@@ -79,8 +79,9 @@ function NewEventModal({ isOpen, onClose }: Props) {
               {...register('endDate', {
                 required: 'This field is required',
                 validate: (endDate) =>
-                  isBefore(new Date(endDate), new Date(getValues().startDate)) &&
-                  'The end date needs to be greater than the start date.',
+                  isBefore(new Date(endDate), new Date(getValues().startDate))
+                    ? 'The end date needs to be greater than the start date.'
+                    : true,
               })}
             />
           </FormControl>

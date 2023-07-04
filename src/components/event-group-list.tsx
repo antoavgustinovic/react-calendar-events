@@ -3,7 +3,7 @@ import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 import { useState } from 'react';
 
 import DisplayTimeRange from '../enums/events';
-import { groupEvents } from '../utils/date-helper';
+import { groupEvents } from '../utils/event-helper';
 import EventList from './event-list';
 import Navbar from './navbar';
 import NewEventModal from './new-event';
