@@ -9,11 +9,11 @@ import { useAuth } from './use-auth';
 
 export const useEvents = () => {
   const { token } = useAuth();
-  return useSWR<calendar_v3.Schema$Events, AxiosError>(EVENTS_URL_KEY, fetcher({ params: eventQueryParams }, token));
+  return useSWR<calendar_v3.Schema$Events, AxiosError>(EVENTS_URL_KEY, fetcher(token, { params: eventQueryParams }));
 };
 
 export const useAddEvent = () => useSWRMutation(EVENTS_URL_KEY, addEvent);
 
 export const useDeleteEvents = () => useSWRMutation(EVENTS_URL_KEY, deleteEvent);
 
-export const preloadEvents = (token: string) => preload(EVENTS_URL_KEY, fetcher({ params: eventQueryParams }, token));
+export const preloadEvents = (token: string) => preload(EVENTS_URL_KEY, fetcher(token, { params: eventQueryParams }));
