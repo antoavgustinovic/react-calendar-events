@@ -21,33 +21,30 @@ interface NewEventRequestBody {
 }
 
 type FetcherFn = {
-  (token: string | null | undefined): (resource: string) => Promise<object>;
-  (init: any): (resource: string) => Promise<object>;
-  (init?: any, token?: string | null): (resource: string) => Promise<object>;
+  (token?: string | null | undefined): (resource: string) => Promise<object>;
+  (init?: object): (resource: string) => Promise<object>;
+  (token?: string | null, init?: object): (resource: string) => Promise<object>;
 };
 
-export const fetcher: FetcherFn = ((initOrToken: any, token?: string | null) => {
-  if (typeof token === 'undefined') {
-    return (resource: string) => {
-      const init = initOrToken;
-      return axios
+export const fetcher: FetcherFn = ((token?: string | null, init?: any) => {
+  if (!token) {
+    return (resource: string) =>
+      axios
         .get(getResourceUrl(resource), {
           ...init,
           headers: {
-            ...init?.headers,
+            ...(init?.headers ?? {}),
           },
         })
         .then((res) => res.data as object);
-    };
   }
 
-  const init = initOrToken;
   return (resource: string) =>
     axios
       .get(getResourceUrl(resource), {
         ...init,
         headers: {
-          ...init?.headers,
+          ...(init?.headers ?? {}),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       })
