@@ -1,5 +1,5 @@
 import { DeleteIcon } from '@chakra-ui/icons';
-import { Box, Center, Flex, Heading, IconButton, Spinner, Text, useDisclosure, useToast } from '@chakra-ui/react';
+import { Box, Flex, Heading, IconButton, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { calendar_v3 } from 'googleapis/build/src/apis/calendar/v3';
 
 import { useDeleteEvents } from '../hooks/use-events';
@@ -8,17 +8,9 @@ import { getDateRangeAndTimeRange } from '../utils/date-helper';
 
 function Event({ event }: { event: calendar_v3.Schema$Event }) {
   const toast = useToast();
-  const { trigger: deleteEvent, isMutating } = useDeleteEvents();
+  const { trigger: deleteEvent } = useDeleteEvents();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { id, start, end, summary } = event;
-
-  if (isMutating) {
-    return (
-      <Center>
-        <Spinner />
-      </Center>
-    );
-  }
 
   const handleDelete = (id: string) => {
     deleteEvent(id, {
