@@ -7,16 +7,14 @@ import { SWRConfig } from 'swr';
 
 import ProtectedRoute from './components/protected-route';
 import { AxiosInterceptor } from './config/axios';
-import { AuthContextProvider, useGetToken } from './hooks/use-auth';
+import { AuthContextProvider } from './hooks/use-auth';
 import ErrorPage from './pages/error/error-page';
 import HomePage from './pages/home/home-page';
 import LoginPage from './pages/login/login';
 
 function Providers() {
-  const tokenState = useGetToken();
-
   return (
-    <AuthContextProvider tokenState={tokenState}>
+    <AuthContextProvider>
       <AxiosInterceptor>
         <SWRConfig>
           <ChakraProvider>

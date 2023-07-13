@@ -20,15 +20,17 @@ export const AuthContext = createContext<AuthContextType>({
 
 type AuthContextProviderProps = {
   children: ReactNode;
-  tokenState: ReturnType<typeof useGetToken>;
 };
 
 const clearCache = () => mutate(() => true, undefined, { revalidate: false });
 
-export function AuthContextProvider({ children, tokenState }: AuthContextProviderProps) {
+export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { token, setToken, removeToken } = tokenState;
+  const [token, setToken, removeToken] = useLocalStorage<string | null>({
+    key: ACCESS_TOKEN,
+    initialValue: null,
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const from: string = (location.state?.from?.pathname as string) || '/';
@@ -62,11 +64,3 @@ export function AuthContextProvider({ children, tokenState }: AuthContextProvide
 export function useAuth() {
   return useContext(AuthContext);
 }
-
-export const useGetToken = () => {
-  const [token, setToken, removeToken] = useLocalStorage<string | null>({
-    key: ACCESS_TOKEN,
-    initialValue: null,
-  });
-  return { token, setToken, removeToken };
-};
