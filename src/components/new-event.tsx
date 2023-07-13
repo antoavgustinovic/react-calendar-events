@@ -1,6 +1,7 @@
 import { Button, HStack, Input, useToast } from '@chakra-ui/react';
 import { isBefore } from 'date-fns';
 import { useForm } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
 
 import ModalType from '../enums/modal';
 import { useAddEvent } from '../hooks/use-events';
@@ -33,7 +34,8 @@ function NewEventModal({ isOpen, onClose }: Props) {
       onSuccess: () => toast({ status: 'success', title: 'Event created successfully' }),
       onError: () => toast({ status: 'error', title: 'There was an error while trying to create your event' }),
       optimisticData: (currentEvents) => {
-        const items = currentEvents?.items ? [...currentEvents.items, requestBody] : [requestBody];
+        const tempId = uuidv4();
+        const items = currentEvents?.items ? [...currentEvents.items, { id: tempId, ...requestBody }] : [requestBody];
         const sortedItems = getSortedEventsByStartDate(items);
 
         return { ...currentEvents, items: sortedItems };

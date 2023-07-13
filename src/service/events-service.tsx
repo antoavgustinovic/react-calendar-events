@@ -59,7 +59,7 @@ export const addEvent = (url: string, { arg }: { arg: NewEventRequestBody }) =>
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   axios.post(url, JSON.stringify(arg)) as Promise<calendar_v3.Schema$Events>;
 
-export const buildEventDTO = (values: NewEventFormData) => {
+export const buildEventDTO = (values: NewEventFormData): NewEventRequestBody => {
   const timeZone = 'Europe/Zagreb';
   return {
     start: {
